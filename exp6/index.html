@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Drawing Tool</title>
+
+</head>
+
+<body>
+
+<div class="toolbar">
+  <input type="color" id="colorPicker" value="#000000">
+  <button id="rectBtn">Rectangle</button>
+  <button id="lineBtn">Free Line</button>
+  <button id="undoBtn">Undo</button>
+</div>
+
+<div class="canvas-container">
+  <svg id="svgCanvas"></svg>
+</div>
+
+<script>
+  const svg = document.getElementById("svgCanvas");
+const colorPicker = document.getElementById("colorPicker");
+const rectBtn = document.getElementById("rectBtn");
+const lineBtn = document.getElementById("lineBtn");
+const undoBtn = document.getElementById("undoBtn");
+
+let currentTool = "rect";
+let startX, startY;
+let drawing = false;
+let currentElement = null;
+
+rectBtn.onclick = () => currentTool = "rect";
+lineBtn.onclick = () => currentTool = "line";
+
+function getMousePosition(evt) {
+  const rect = svg.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
+svg.addEventListener("mousedown", (e) => {
+  drawing = true;
+  const pos = getMousePosition(e);
+  startX = pos.x;
+  startY = pos.y;
+
+  if (currentTool === "rect") {
+    currentElement = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    currentElement.setAttribute("x", startX);
+    currentElement.setAttribute("y", startY);
+    currentElement.setAttribute("width", 0);
+    currentElement.setAttribute("height", 0);
+    currentElement.setAttribute("fill", "none");
+    currentElement.setAttribute("stroke", colorPicker.value);
+    currentElement.setAttribute("stroke-width", 2);
+  }
+
+  if (currentTool === "line") {
+    currentElement = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    currentElement.setAttribute("points", `${startX},${startY}`);
+    currentElement.setAttribute("fill", "none");
+    currentElement.setAttribute("stroke", colorPicker.value);
+    currentElement.setAttribute("stroke-width", 2);
+  }
+
+  svg.appendChild(currentElement);
+});
+
+svg.addEventListener("mousemove", (e) => {
+  if (!drawing) return;
+  const pos = getMousePosition(e);
+
+  if (currentTool === "rect") {
+    const width = pos.x - startX;
+    const height = pos.y - startY;
+
+    currentElement.setAttribute("width", Math.abs(width));
+    currentElement.setAttribute("height", Math.abs(height));
+    currentElement.setAttribute("x", Math.min(startX, pos.x));
+    currentElement.setAttribute("y", Math.min(startY, pos.y));
+  }
+
+  if (currentTool === "line") {
+    const points = currentElement.getAttribute("points");
+    currentElement.setAttribute("points", points + ` ${pos.x},${pos.y}`);
+  }
+});
+
+svg.addEventListener("mouseup", () => {
+  drawing = false;
+  currentElement = null;
+});
+
+undoBtn.onclick = () => {
+  if (svg.lastChild) {
+    svg.removeChild(svg.lastChild);
+  }
+};
+
+</script>
+</body> 
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    padding: 1rem;
+    background: #f4f6f8;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  button, input[type="color"] {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #e0e0e0;
+  }
+
+  .canvas-container {
+    width: 100%;
+    height: 70vh;
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+</style> 
+
+</html>
