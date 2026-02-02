@@ -1,1 +1,112 @@
-Its working
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Input with Counter</title>
+</head>
+<body>
+
+  <div class="input-container">
+    <textarea 
+      id="textInput" 
+      placeholder="Type your message..."
+      maxlength="150">
+    </textarea>
+
+    <div class="counter">
+      <span id="count">0</span>/150
+    </div>
+  </div>
+
+  <script >
+    const textInput = document.getElementById("textInput");
+const count = document.getElementById("count");
+const counter = document.querySelector(".counter");
+
+const MAX = 150;
+
+textInput.addEventListener("input", () => {
+  const length = textInput.value.length;
+  count.textContent = length;
+
+  // Remove previous states
+  textInput.classList.remove("warning", "danger");
+  counter.classList.remove("warning", "danger");
+
+  if (length >= MAX * 0.8 && length < MAX) {
+    textInput.classList.add("warning");
+    counter.classList.add("warning");
+  }
+
+  if (length === MAX) {
+    textInput.classList.add("danger");
+    counter.classList.add("danger");
+  }
+});
+  </script>
+</body>
+<style>
+  * {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f4f6f8;
+  
+}
+
+.input-container {
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 2px solid #ccc;
+  resize: none;
+  transition: border-color 0.3s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.counter {
+  text-align: right;
+  font-size: 14px;
+  color: #555;
+  transition: color 0.3s ease;
+}
+
+.counter.warning {
+  color: orange;
+}
+
+.counter.danger {
+  color: red;
+}
+
+textarea.warning {
+  border-color: orange;
+}
+
+textarea.danger {
+  border-color: red;
+}
+</style>
+
+</html>
